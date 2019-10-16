@@ -4,6 +4,7 @@
   "description": "Template project for typescript and rollup",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.mjs",
+  "browser": "lib/index.umd.js",
   "scripts": {
     "build:config": "tsc --project config/tsconfig.json",
     "prebuild:devtools": "npm run build:config",
