@@ -20,8 +20,7 @@
     "prepublishOnly": "npm run clean && NODE_ENV=production npm run build",
     "build:docs": "GRAPHVIZ_DOT=\"$(which dot)\" typedoc -out docs/api src/"
   },
-  "bin": {
-  },
+  "bin": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BobKerns/page-activity-status-monitor.git"
