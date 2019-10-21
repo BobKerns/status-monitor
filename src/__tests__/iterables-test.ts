@@ -28,8 +28,8 @@ interface BulkChecks {
  * @param fn The function under test.
  */
 const testPredicates = (fn: (v: unknown) => boolean): BulkChecks => {
-    const truthy = (...vals: any[]) => () => vals.forEach(v => expect(fn(v)).toBeTruthy());
-    const falsy = (...vals: any[]) => () => vals.forEach((v => expect(fn(v)).toBeFalsy()));
+    const truthy = (...vals: any[]) => () => { vals.forEach(v => expect(fn(v)).toBeTruthy()); }
+    const falsy = (...vals: any[]) => () => { vals.forEach(v => expect(fn(v)).toBeFalsy()); }
     return {truthy, falsy};
 };
 
@@ -51,7 +51,7 @@ describe("Iterable Checks", () =>{
    describe("isPossiblyIterator", () => {
        const {falsy, truthy} = testPredicates(isPossiblyIterator);
        describe("Negative", () => {
-           test("booleans", () => falsy(true, false));
+           test("booleans", falsy(true, false));
            test('numbers', falsy(10, 0, -1, 3.5));
            test('undefined', falsy(undefined, null));
            test("string", falsy("", "longer string"));
