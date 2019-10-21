@@ -6,7 +6,7 @@
 /**
  * Provide event distribution services. Events published with {@link EventDistributor#notify} are delivered to every
  */
-class EventDistributor {
+export class EventDistributor {
     private done: boolean = false;
     private watcherCount: number = 0;
     private readCount: number = 0;
