@@ -11,3 +11,4 @@
 
 export * from './idgen';
 export * from './event-queue';
+export * from './iterables';
