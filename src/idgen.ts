@@ -1,4 +1,7 @@
-// Copyright  by Bob Kerns. Licensed under MIT license
+/**
+ * @module statusMonitor
+ * Copyright © 20190 by Bob Kerns. MIT License.
+ */
 
 /**
  * Generator of ID values, either as a series of numbers, or in the form _prefix_-_number_.

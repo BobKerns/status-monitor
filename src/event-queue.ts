@@ -1,4 +1,9 @@
 /**
+ * @module statusMonitor
+ * Copyright © 20190 by Bob Kerns. MIT License.
+ */
+
+/**
  * Provide event distribution services. Events published with {@link EventDistributor#notify} are delivered to every
  */
 class EventDistributor {
