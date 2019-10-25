@@ -7,14 +7,28 @@
  * Utilities for working with various type of iterables.
  */
 
-/**
- * The constructor marking GeneratorFunction's
- */
-const genFun = (function*(): IterableIterator<unknown> {});
-const GeneratorFunction: GeneratorFunctionConstructor = Object.getPrototypeOf(genFun).constructor;
-const genIter = (genFun)()[Symbol.iterator]();
-const genIterProto = Object.getPrototypeOf(genIter);
-const Generator: GeneratorFunction = genIterProto.constructor;
+export type Element<T extends Sequence<unknown>> = T extends Iterator<infer E>
+    ? E
+    : T extends Iterable<infer E>
+        ? E
+        : never;
+export type ToIterator<T extends Sequence> = Iterator<Element<T>>;
+export type ToIterable<T extends Sequence> = Iterable<Element<T>>;
+
+export type Sequence<E = any> = Iterator<E> | Iterable<E>;
+
+export class IterableWrapper<I extends Sequence> implements ToIterable<I> {
+    private readonly iter: ToIterator<I>;
+    constructor(iter: ToIterator<I>) {
+        this.iter = iter;
+    }
+
+    [Symbol.iterator](): ToIterator<I> { return this.iter; }
+}
+
+export function notIterable<R>(val: unknown): R {
+    throw new TypeError(`Not an Iterator nor an Iterable: ${val}`);
+}
 
 /**
  * Determine if an object can have arbitrary properties.  Type guard for {[a: string]: unknown}
@@ -28,10 +42,10 @@ export function isObjectLike(obj: unknown): obj is {[a: string]: unknown} {
  * Determine if an object appears to possibly implement the Iterable protocol. This is not definitive, but it is
  * useful because we usually will not be testing arbitrary objects, but rather a handful of known types. The user
  * is responsible for ensuring nothing bad happens if the object does not actually implement the ``Iterator`` protocol
- * despite having the right shape.
+ * despite having the right shape.å
  * @param obj
  */
-export function isPossiblyIterator<A>(obj: unknown): obj is Iterator<A> {
+export function isPossiblyIterator<I extends Sequence>(obj: any): obj is ToIterator<I> {
     if (isObjectLike(obj)) {
         if (typeof obj.next === 'function') {
             return true;
@@ -44,10 +58,36 @@ export function isPossiblyIterator<A>(obj: unknown): obj is Iterator<A> {
  * Determine if an object is in fact Iterable. A type guard. Unlike [[isPossiblyIterator]], the test is definitive.
  * @param obj
  */
-export function isIterable<A>(obj: unknown): obj is Iterable<A> {
+export function isIterable<S extends Sequence>(obj: any): obj is ToIterable<S> {
     if (isObjectLike(obj) || typeof obj === 'string') {
         let fn = (obj as any)[Symbol.iterator];
         return !!fn &&  typeof fn === 'function';
     }
     return false;
+}
+
+/**
+ * Coerce a sequence (Iterable or Iterator) to an Iterable.
+ * @param seq
+ */
+export function iterable<S extends Sequence>(seq: S): ToIterable<S> {
+    if (isIterable(seq)) {
+        return seq;
+    } else if (isPossiblyIterator(seq)) {
+        return new IterableWrapper(seq);
+    }
+    return notIterable(seq);
+}
+
+/**
+ * Coerce a sequence of Iterator) to an Iterator.
+ * @param seq
+ */
+export function iterator<S extends Sequence>(seq: S): ToIterator<S> {
+    if (isIterable(seq)) {
+        return seq[Symbol.iterator]();
+    } else if (isPossiblyIterator(seq)) {
+        return seq;
+    }
+    return notIterable(seq);
 }
