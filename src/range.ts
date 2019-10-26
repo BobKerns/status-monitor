@@ -68,3 +68,43 @@ export function toArray<S extends Sequence>(seq: S, maxSize: number = Infinity):
     }
     return toArray(limit(seq, maxSize));
 }
+
+/**
+ * Take a sub range of a [[Sequence]], returning an Iterable. It is an error for `end` to be less than `start`;
+ * @param seq A Sequence (Array or other Iterable, or an Iterator).
+ * @param start The starting position for the subsequence.
+ * @param end The end position for the subsequence. The subsequence ends immediately before this index. Infinity if no end.
+ */
+export function subseq<S extends Sequence>(seq: S, start: number = 0, end: number = Infinity) {
+    const nEnd = end === Infinity ? Infinity : end - start;
+    return limit(skip(seq, start), nEnd);
+}
+
+/**
+ * Return an iterable gnerator of numbers between `start` and `end`, incrementing by `increment`.
+ * The numbers do not need to be positive or integers.
+ * @param start defaults to 0
+ * @param end defaults to Infinity
+ * @param increment defaults to 1
+ */
+export function range(start: number = 0, end: number = Infinity, increment: number = 1) {
+    if (typeof start !== 'number') throw new Error(`Invalid start value: ${start}`);
+    if (typeof end !== 'number') throw new Error(`Invalid end value: ${end}`);
+    if (typeof increment !== 'number') throw new Error(`Invalid increment value: ${increment}`);
+    function *rangeGenerator() {
+        let i = start;
+        if (increment > 0) {
+            while (i < end) {
+                yield i;
+                i += increment;
+            }
+        } else {
+            while (i > end) {
+                yield i;
+                i += increment;
+            }
+        }
+        return i;
+    }
+    return rangeGenerator();
+}

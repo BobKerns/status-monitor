@@ -3,7 +3,7 @@
  * Copyright © 2019 by Bob Kerns. Licensed under MIT license
  */
 
-import {limit, skip, toArray} from "../range";
+import {limit, skip, subseq, toArray} from "../range";
 import {Sequence} from "../iterables";
 
 /**
@@ -19,6 +19,7 @@ function *testGen() {
 
 describe("Range Tests", () => {
     const ar = [7, "bar", true];
+    const arr = [...ar, ...ar];
     // test toArray first, so we can use it in other tests.
     describe('toArray', () => {
         describe("Full Array", () => {
@@ -102,16 +103,15 @@ describe("Range Tests", () => {
     });
     // Test limit
     describe("limit", () => {
-        const limitTest = (v: Sequence, count: number, val: Array<any>) =>
+        const limitTest = (v: Sequence, val: Array<any>, count: number = Infinity) =>
             () =>
                 expect(toArray(limit(v, count)))
                     .toEqual(val);
-        test("Unlimited", () =>
-            expect(limit(ar)).toEqual(ar));
-        test("Larger", limitTest(ar, 100, ar));
-        test("Equal", limitTest(ar, ar.length, ar));
-        test("Smaller", limitTest(ar, 2, [ar[0], ar[1]]));
-        test("Zero", limitTest(ar, 0, []));
+        test("Unlimited", limitTest(ar, ar));
+        test("Larger", limitTest(ar, ar, 100));
+        test("Equal", limitTest(ar, ar, ar.length));
+        test("Smaller", limitTest(ar, [ar[0], ar[1]], 2));
+        test("Zero", limitTest(ar, [], 0));
         describe("Error cases", () => {
             test("Negative size", () =>
                 expect(() => limit([], -1))
@@ -123,5 +123,22 @@ describe("Range Tests", () => {
                 expect(() => limit([], 3.14159))
                     .toThrow());
         });
+    });
+
+    // Test subseq
+    describe("subseq", () => {
+        const subseqTest = (v: Sequence, val: Array<any>, start: number = 0, end: number = Infinity) =>
+            () =>
+                expect(toArray(subseq(v, start, end)))
+                    .toEqual(val);
+        test("Full", subseqTest(arr, arr));
+        test("Skip", subseqTest(arr, [ar[2], ...ar], 2));
+        test("limit", subseqTest(arr, [...ar, ar[0]], 0, 4));
+        test("Range", subseqTest(arr, [ar[1], ar[2], ar[0], ar[1]], 1, 5));
+        test("Null Range", subseqTest(arr, [], 4, 4));
+        test("bad bounds", () =>
+        expect(() =>
+            subseq(arr, 5,2))
+            .toThrow());
     });
 });
