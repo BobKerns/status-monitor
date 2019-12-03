@@ -3,8 +3,9 @@
  * Copyright © 2019 by Bob Kerns. Licensed under MIT license
  */
 
-import {limit, skip, subseq, toArray} from "../range";
+import {limit, range, skip, subseq, toArray} from "../range";
 import {Sequence} from "../iterables";
+const PI = Math.PI;
 
 /**
  * Tests of the range utilities.
@@ -140,5 +141,25 @@ describe("Range Tests", () => {
         expect(() =>
             subseq(arr, 5,2))
             .toThrow());
+    });
+
+    // Test ranges
+    describe("range", () => {
+       const rangeTest = (expected: any, start: number = 0, end: number = Infinity, increment: number = 1) =>
+           () =>
+               expect(toArray(range(start, end, increment)))
+                   .toEqual(expected);
+
+        test("empty@0", rangeTest([],0, 0));
+        test("empty@10", rangeTest([],10, 10));
+        test("empty@10/0", rangeTest([], 10));
+        test("1@start", rangeTest([0], 0, 1));
+        test("3@start", rangeTest([0, 1, 2], 0, 3));
+        test("3@start+3", rangeTest([0, 3, 6], 0, 7, 3));
+        test("3@start+3@fencepost", rangeTest([0, 3], 0, 6, 3));
+        test("3@start-3", rangeTest([0, -3, -6], 0, -7));
+        test("3@start-3@fencepost", rangeTest([0, -3], 0, -6));
+        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -6, -PI));
+        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -6, -PI));
     });
 });
