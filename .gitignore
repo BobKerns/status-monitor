@@ -34,6 +34,9 @@ node_modules
 /config/lib
 !.gitignore
 
+report*.json
+report*.txt
+
 # IDE settings are a mixed bag.
 
 # Include project code style settings. This can be controversial, but it can also reduce friction by
@@ -63,4 +66,3 @@ node_modules
 
 #.*
 /.rpt2_cache
-
