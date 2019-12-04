@@ -45,7 +45,7 @@ export function isObjectLike(obj: unknown): obj is {[a: string]: unknown} {
  * despite having the right shape.å
  * @param obj
  */
-export function isPossiblyIterator<I extends Sequence>(obj: any): obj is ToIterator<I> {
+export function isPossiblyIterator<E extends any, I extends Sequence<E>>(obj: any): obj is ToIterator<I> {
     if (isObjectLike(obj)) {
         if (typeof obj.next === 'function') {
             return true;
@@ -58,7 +58,7 @@ export function isPossiblyIterator<I extends Sequence>(obj: any): obj is ToItera
  * Determine if an object is in fact Iterable. A type guard. Unlike [[isPossiblyIterator]], the test is definitive.
  * @param obj
  */
-export function isIterable<S extends Sequence>(obj: any): obj is ToIterable<S> {
+export function isIterable<E extends any, S extends Sequence<E>>(obj: any): obj is ToIterable<S> {
     if (isObjectLike(obj) || typeof obj === 'string') {
         let fn = (obj as any)[Symbol.iterator];
         return !!fn &&  typeof fn === 'function';
@@ -70,7 +70,7 @@ export function isIterable<S extends Sequence>(obj: any): obj is ToIterable<S> {
  * Coerce a sequence (Iterable or Iterator) to an Iterable.
  * @param seq
  */
-export function iterable<S extends Sequence>(seq: S): ToIterable<S> {
+export function iterable<E, S extends Sequence<E>>(seq: S): ToIterable<S> {
     if (isIterable(seq)) {
         return seq;
     } else if (isPossiblyIterator(seq)) {
@@ -83,7 +83,7 @@ export function iterable<S extends Sequence>(seq: S): ToIterable<S> {
  * Coerce a sequence of Iterator) to an Iterator.
  * @param seq
  */
-export function iterator<S extends Sequence>(seq: S): ToIterator<S> {
+export function iterator<E, S extends Sequence<E>>(seq: S): ToIterator<S> {
     if (isIterable(seq)) {
         return seq[Symbol.iterator]();
     } else if (isPossiblyIterator(seq)) {

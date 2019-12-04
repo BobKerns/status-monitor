@@ -14,16 +14,16 @@ import {isIterable, isPossiblyIterator, iterable, Element, iterator, notIterable
  * @param seq An [[Iterable]] or [[Iterator]]
  * @param count The number of entries to skip. Must be >= 0.
  */
-export function skip<S extends Sequence>(seq: S, count: number = Infinity): ToIterable<S> {
+export function skip<E extends any>(seq: Sequence<E>, count: number = Infinity):Iterable<E> {
     if (count < 0 || !Number.isInteger(count)) throw new Error(`Invalid maxSize: ${{count}}`);
     if (count === 0) {
         return iterable(seq);
     }
-    const iter = iterator(seq);
+    const iter = iterator<E, Sequence<E>>(seq);
     for (let i = 0; i < count; i++) {
         const r = iter.next();
         if (r.done) {
-            return iterable(iter);
+            return iterable<E, Sequence<E>>(iter);
         }
     }
     return iterable(iter);
@@ -46,7 +46,7 @@ export function limit<S extends Sequence>(seq: S, maxSize: number = Infinity): T
         for (let i = 0; i < maxSize; i++) {
             const v = iter.next();
             const value = v.value;
-            done = done || v.done;
+            done = done || v.done || false;
             if (!done) {
                 yield value;
             } else {
