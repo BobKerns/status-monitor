@@ -63,7 +63,7 @@ export const outputs = (p: Package) => flatMap((e: OutputOptions) => (e.file ? [
  * @param entries A array of keys to check for entry points in [[package.json]].
  */
 const mainFields = (p: Package, entries: string[]) =>
-    flatMap((f: string) => (pkg[f] ? [f] : []) as ReadonlyArray<string>,
+    flatMap((f: string) => (pkg[f] ? [f] : []) as Array<string>,
         entries);
 
 /**
