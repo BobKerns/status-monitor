@@ -16,6 +16,9 @@ import {isIterable, isPossiblyIterator, iterable, Element, iterator, notIterable
  */
 export function skip<E extends any>(seq: Sequence<E>, count: number = Infinity):Iterable<E> {
     if (count < 0 || !Number.isInteger(count)) throw new Error(`Invalid maxSize: ${{count}}`);
+    if (!Number.isSafeInteger(count)) {
+        throw new Error(`maxSize argument too large for Javascript: ${count}.`);
+    }
     if (count === 0) {
         return iterable(seq);
     }
@@ -35,22 +38,49 @@ export function skip<E extends any>(seq: Sequence<E>, count: number = Infinity):
  * @param maxSize
  */
 export function limit<S extends Sequence>(seq: S, maxSize: number = Infinity): ToIterable<S> {
-    // Do the error check first, then make the generator.
     if (maxSize === Infinity) {
         return iterable(seq);
     }
+    // Do the error check first, then make the generator.
+    if (!Number.isSafeInteger(maxSize)) {
+        throw new Error(`maxSize argument not a number or too large for Javascript: ${maxSize}.`);
+    }
     if (maxSize < 0 || !Number.isInteger(maxSize)) throw new Error(`Invalid maxSize: ${{maxSize}}`);
     function *doLimit(seq: S, maxSize: number): ToIterable<S> {
-        let done = false;
-        const iter = iterator(seq);
-        for (let i = 0; i < maxSize; i++) {
-            const v = iter.next();
-            const value = v.value;
-            done = done || v.done || false;
-            if (!done) {
-                yield value;
-            } else {
-                return value;
+        let i = 0;
+        if (maxSize < 1) {
+            return;
+        }
+        for (const v of iterable(seq)) {
+            yield v;
+            if (++i >= maxSize) {
+                return;
+            }
+        }
+    }
+    return doLimit(seq, maxSize);
+}
+
+/**
+ * Limit a sequence (Iterable or Iterator) to `maxSize` elements for safety.
+ * @param seq
+ * @param maxSize (default = 1 million)
+ */
+export function safetyLimit<S extends Sequence>(seq: S, maxSize: number = 1000000): ToIterable<S> {
+    // Do the error check first, then make the generator.
+    if (!Number.isSafeInteger(maxSize)) {
+        throw new Error(`maxSize argument not a number or too large for Javascript: ${maxSize}.`);
+    }
+    if (maxSize < 0 || !Number.isInteger(maxSize)) throw new Error(`Invalid maxSize: ${{maxSize}}`);
+    function *doLimit(seq: S, maxSize: number): ToIterable<S> {
+        let i = 0;
+        if (maxSize < 1) {
+            return;
+        }
+        for (const v of iterable(seq)) {
+            yield v;
+            if (++i >= maxSize) {
+                throw new Error(`Excessive sequence length: ${i}`);
             }
         }
     }
@@ -65,6 +95,10 @@ export function limit<S extends Sequence>(seq: S, maxSize: number = Infinity): T
 export function toArray<S extends Sequence>(seq: S, maxSize: number = Infinity): Array<Element<S>> {
     if (maxSize === Infinity) {
         return [...iterable(seq)];
+    } else if (!Number.isSafeInteger(maxSize) || maxSize < 0) {
+        throw new Error(`Size ${maxSize} cannot be negative.`);
+    } else if (maxSize < 1) {
+        return [];
     }
     return toArray(limit(seq, maxSize));
 }
@@ -98,6 +132,8 @@ export function range(start: number = 0, end: number = Infinity, increment: numb
                 yield i;
                 i += increment;
             }
+        } else if (increment === 0) {
+            throw new Error("Zero increment not allowed in range.")
         } else {
             while (i > end) {
                 yield i;

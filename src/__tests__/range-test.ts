@@ -152,14 +152,14 @@ describe("Range Tests", () => {
 
         test("empty@0", rangeTest([],0, 0));
         test("empty@10", rangeTest([],10, 10));
-        test("empty@10/0", rangeTest([], 10));
+        test("empty@10/0", rangeTest([], 10, 0));
         test("1@start", rangeTest([0], 0, 1));
         test("3@start", rangeTest([0, 1, 2], 0, 3));
         test("3@start+3", rangeTest([0, 3, 6], 0, 7, 3));
         test("3@start+3@fencepost", rangeTest([0, 3], 0, 6, 3));
-        test("3@start-3", rangeTest([0, -3, -6], 0, -7));
-        test("3@start-3@fencepost", rangeTest([0, -3], 0, -6));
-        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -6, -PI));
-        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -6, -PI));
+        test("3@start-3", rangeTest([0, -3, -6], 0, -7, -3));
+        test("3@start-3@fencepost", rangeTest([0, -3], 0, -6, -3));
+        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -7, -PI));
+        test("3@start-3@nonint", rangeTest([0, -PI, -PI-PI], 0, -7, -PI));
     });
 });
