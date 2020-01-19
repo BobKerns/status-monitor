@@ -46,6 +46,7 @@ report*.txt
 # Useful to share, terms that appear and would be flagged by spell checking.
 !.idea/dictionaries/**
 !/.idea/markdown-navigator/*
+/.idea/markdown-history.xml
 !/.idea/markdown-navigator.xml
 !/.idea/misc.xml
 !.idea/vcs.xml
