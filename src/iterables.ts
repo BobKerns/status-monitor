@@ -70,10 +70,10 @@ export function isIterable<E extends any, S extends Sequence<E>>(obj: any): obj 
  * Coerce a sequence (Iterable or Iterator) to an Iterable.
  * @param seq
  */
-export function iterable<E, S extends Sequence<E>>(seq: S): ToIterable<S> {
-    if (isIterable(seq)) {
+export function iterable<E extends any, S extends Sequence<E>>(seq: S): ToIterable<S> {
+    if (isIterable<E,S>(seq)) {
         return seq;
-    } else if (isPossiblyIterator(seq)) {
+    } else if (isPossiblyIterator<E,S>(seq)) {
         return new IterableWrapper(seq);
     }
     return notIterable(seq);
@@ -84,9 +84,9 @@ export function iterable<E, S extends Sequence<E>>(seq: S): ToIterable<S> {
  * @param seq
  */
 export function iterator<E, S extends Sequence<E>>(seq: S): ToIterator<S> {
-    if (isIterable(seq)) {
-        return seq[Symbol.iterator]();
-    } else if (isPossiblyIterator(seq)) {
+    if (isIterable<E,S>(seq)) {
+        return seq[Symbol.iterator]() as ToIterator<S>;
+    } else if (isPossiblyIterator<E,S>(seq)) {
         return seq;
     }
     return notIterable(seq);

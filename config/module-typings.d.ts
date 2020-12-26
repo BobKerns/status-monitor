@@ -27,5 +27,5 @@ declare module "rollup-plugin-visualizer" {
         open: boolean;
         openOptions: OpenOptions;
     }
-    export default function visualizer(options?: Partial<VisualizerOptions>): Plugin;
+    export default function visualizer(options?: Partial<VisualizerOptions>): Omit<Plugin, 'name'>;
 }
